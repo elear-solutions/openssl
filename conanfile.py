@@ -32,29 +32,15 @@ class OpenSSLConan(ConanFile):
                "no_rsa": [True, False],
                "no_sha": [True, False],
                "no_fpic": [True, False]}
-    default_options = "=False\n".join(options.keys()) + "=False"
+    default_options = {key: False for key in options.keys()}
+    default_options["no_asm"] = True
     
-    # When a new version is available they move the tar.gz to old/ location
-    source_tgz = "https://www.openssl.org/source/openssl-%s.tar.gz" % version
-    source_tgz_old = "https://www.openssl.org/source/old/1.1.0/openssl-%s.tar.gz" % version
-
     def build_requirements(self):
         # useful for example for conditional build_requires
         if self.compiler == "Visual Studio":
             self.build_requires("strawberryperl/5.26.0@conan/stable")
             if not self.options.no_asm:
                 self.build_requires("nasm/2.13.01@conan/stable")
-
-    def source(self):
-        self.output.info("Downloading %s" % self.source_tgz)
-        try:
-            tools.download(self.source_tgz_old, "openssl.tar.gz")
-        except:
-            tools.download(self.source_tgz, "openssl.tar.gz")
-        tools.unzip("openssl.tar.gz")
-        tools.check_sha256("openssl.tar.gz",
-                           "5c557b023230413dfb0756f3137a13e6d726838ccd1430888ad15bfb2b43ea4b")
-        os.unlink("openssl.tar.gz")
 
     def configure(self):
         del self.settings.compiler.libcxx
@@ -65,7 +51,6 @@ class OpenSSLConan(ConanFile):
 
     @property
     def subfolder(self):
-        #return os.path.join(self.source_folder, "openssl-%s" % self.version)
         return os.path.join(self.source_folder, ".")
 
     @property
