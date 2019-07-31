@@ -1,4 +1,4 @@
-from conans import ConanFile, AutoToolsBuildEnvironment
+from conans import ConanFile, AutoToolsBuildEnvironment, tools
 import os
 import sys
 
@@ -42,12 +42,9 @@ class OpenSSLConan(ConanFile):
             if not self.options.no_asm:
                 self.build_requires("nasm/2.13.01@conan/stable")
 
-    def configure(self):
-        del self.settings.compiler.libcxx
-
     def requirements(self):
         if not self.options.no_zlib:
-            self.requires("zlib/1.2.11@conan/stable")
+            self.requires("zlib/1.2.11@jenkins/stable")
 
     @property
     def subfolder(self):
