@@ -2,7 +2,6 @@ from conans import ConanFile, AutoToolsBuildEnvironment, tools
 import os
 import sys
 
-
 class OpenSSLConan(ConanFile):
     name = "openssl"
     settings = "os", "compiler", "arch", "build_type"
