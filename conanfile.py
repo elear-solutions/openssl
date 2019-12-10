@@ -315,15 +315,15 @@ class OpenSSLConan(ConanFile):
                 if "AS" in os.environ:
                     tools.replace_in_file(makefile_org, "AS=$(CC) -c", "AS=%s" % os.environ["AS"])
                 if self.settings.os == "Macos":
-                    tools.replace_in_file(makefile_org, "-L$${libdir} -lcrypto", "{libdir}/libcrypto.a")
-                    tools.replace_in_file(makefile_org, "-L$${libdir} -lssl", "{libdir}/libssl.a")
+                    tools.replace_in_file(makefile_org, "-L$${libdir} -lcrypto", "$${libdir}/libcrypto.a")
+                    tools.replace_in_file(makefile_org, "-L$${libdir} -lssl", "$${libdir}/libssl.a")
             else:
                 self.output.info("CROSS_COMPILE: enabled")
                 if self.settings.os == "iOS":
                     self.output.info("CROSS_COMPILE: iOS")
                     tools.replace_in_file(makefile_org, "AR=ar $(ARFLAGS) r", "AR=%s" % "libtool -o")
-                    tools.replace_in_file(makefile_org, "-L$${libdir} -lcrypto", "{libdir}/libcrypto.a")
-                    tools.replace_in_file(makefile_org, "-L$${libdir} -lssl", "{libdir}/libssl.a")
+                    tools.replace_in_file(makefile_org, "-L$${libdir} -lcrypto", "$${libdir}/libcrypto.a")
+                    tools.replace_in_file(makefile_org, "-L$${libdir} -lssl", "$${libdir}/libssl.a")
 
     def _get_env_build(self):
         if not self._env_build:
