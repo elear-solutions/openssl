@@ -95,7 +95,6 @@ class OpenSSLConan(ConanFile):
     default_options["fPIC"] = True
     default_options["openssldir"] = None
     _env_build = None
-    version="1.0.2-u"
 
     def build_requirements(self):
         # useful for example for conditional build_requires
@@ -458,7 +457,7 @@ class OpenSSLConan(ConanFile):
         args = " ".join(self._configure_args)
         self.output.info(self._configure_args)
 
-        self.run('{perl} ../Configure {args}'.format(perl=self._perl, args=args), win_bash=self._win_bash)
+        self.run('{perl} ./Configure {args}'.format(perl=self._perl, args=args), win_bash=self._win_bash)
 
         self._patch_install_name()
 
@@ -579,13 +578,10 @@ class OpenSSLConan(ConanFile):
     def package_info(self):
         self.cpp_info.name = "OpenSSL"
         if self._use_nmake:
-            if self._full_version < "1.1.0":
-                self.cpp_info.libs = ["ssleay32", "libeay32"]
+            if self.settings.build_type == "Debug":
+                self.cpp_info.libs = ['libssld', 'libcryptod']
             else:
-                if self.settings.build_type == "Debug":
-                    self.cpp_info.libs = ['libssld', 'libcryptod']
-                else:
-                    self.cpp_info.libs = ['libssl', 'libcrypto']
+                self.cpp_info.libs = ['libssl', 'libcrypto']
         else:
             self.cpp_info.libs = ["ssl", "crypto"]
         if self.settings.os == "Windows":
