@@ -297,6 +297,13 @@ class OpenSSLConan(ConanFile):
         apps_makefile = os.path.join(self._source_subfolder, "apps/Makefile")
         test_makefile = os.path.join(self._source_subfolder, "test/Makefile")
         env_build = self._get_env_build()
+        if tools.is_apple_os(self.settings.os):
+            tools.replace_in_file(makefile_org, "-L$${libdir} -lcrypto", "$${libdir}/libcrypto.a")
+            tools.replace_in_file(makefile_org, "-L$${libdir} -lssl", "$${libdir}/libssl.a")
+            tools.replace_in_file(apps_makefile, "LIBCRYPTO=-L.. -lcrypto","LIBCRYPTO=../libcrypto.a")
+            tools.replace_in_file(apps_makefile, "LIBSSL=-L.. -lssl","LIBSSL=../libssl.a")
+            tools.replace_in_file(test_makefile, "LIBCRYPTO= -L.. -lcrypto","LIBCRYPTO=../libcrypto.a")
+            tools.replace_in_file(test_makefile, "LIBSSL= -L.. -lssl","LIBSSL=../libssl.a")
         with tools.environment_append(env_build.vars):
             if not "CROSS_COMPILE" in os.environ:
                 self.output.info("CROSS_COMPILE: disabled")
@@ -316,24 +323,6 @@ class OpenSSLConan(ConanFile):
                     tools.replace_in_file(makefile_org, "NM= nm", "NM= %s" % os.environ["NM"])
                 if "AS" in os.environ:
                     tools.replace_in_file(makefile_org, "AS=$(CC) -c", "AS=%s" % os.environ["AS"])
-                if self.settings.os == "Macos":
-                    tools.replace_in_file(makefile_org, "-L$${libdir} -lcrypto", "$${libdir}/libcrypto.a")
-                    tools.replace_in_file(makefile_org, "-L$${libdir} -lssl", "$${libdir}/libssl.a")
-                    tools.replace_in_file(apps_makefile, "LIBCRYPTO=-L.. -lcrypto","LIBCRYPTO=../libcrypto.a")
-                    tools.replace_in_file(apps_makefile, "LIBSSL=-L.. -lssl","LIBSSL=../libssl.a")
-                    tools.replace_in_file(test_makefile, "LIBCRYPTO= -L.. -lcrypto","LIBCRYPTO=../libcrypto.a")
-                    tools.replace_in_file(test_makefile, "LIBSSL= -L.. -lssl","LIBSSL=../libssl.a")
-            else:
-                self.output.info("CROSS_COMPILE: enabled")
-                if self.settings.os == "iOS":
-                    self.output.info("CROSS_COMPILE: iOS")
-                    tools.replace_in_file(makefile_org, "AR=ar $(ARFLAGS) r", "AR=%s" % "libtool -o")
-                    tools.replace_in_file(makefile_org, "-L$${libdir} -lcrypto", "$${libdir}/libcrypto.a")
-                    tools.replace_in_file(makefile_org, "-L$${libdir} -lssl", "$${libdir}/libssl.a")
-                    tools.replace_in_file(apps_makefile, "LIBCRYPTO=-L.. -lcrypto","LIBCRYPTO=../libcrypto.a")
-                    tools.replace_in_file(apps_makefile, "LIBSSL=-L.. -lssl","LIBSSL=../libssl.a")
-                    tools.replace_in_file(test_makefile, "LIBCRYPTO= -L.. -lcrypto","LIBCRYPTO=../libcrypto.a")
-                    tools.replace_in_file(test_makefile, "LIBSSL= -L.. -lssl","LIBSSL=../libssl.a")
 
     def _get_env_build(self):
         if not self._env_build:
