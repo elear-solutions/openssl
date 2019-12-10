@@ -310,7 +310,7 @@ class OpenSSLConan(ConanFile):
                 cc = os.environ.get("CC", "cc")
                 tools.replace_in_file(makefile_org, "CC= cc", "CC= %s %s" % (cc, os.environ["CFLAGS"]))
                 if "AR" in os.environ:
-                    if self.settings.os == "Macos":
+                    if tools.is_apple_os(self.settings.os):
                         tools.replace_in_file(makefile_org, "AR=ar $(ARFLAGS) r", "AR=%s" % "libtool -o")
                     else:
                         tools.replace_in_file(makefile_org, "AR=ar", "AR=%s" % os.environ["AR"])
