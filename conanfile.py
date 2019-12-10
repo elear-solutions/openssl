@@ -321,8 +321,8 @@ class OpenSSLConan(ConanFile):
                     tools.replace_in_file(makefile_org, "-L$${libdir} -lssl", "$${libdir}/libssl.a")
                     tools.replace_in_file(apps_makefile, "LIBCRYPTO=-L.. -lcrypto","LIBCRYPTO=../libcrypto.a")
                     tools.replace_in_file(apps_makefile, "LIBSSL=-L.. -lssl","LIBSSL=../libssl.a")
-                    tools.replace_in_file(test_makefile, "LIBCRYPTO=-L.. -lcrypto","LIBCRYPTO=../libcrypto.a")
-                    tools.replace_in_file(test_makefile, "LIBSSL=-L.. -lssl","LIBSSL=../libssl.a")
+                    tools.replace_in_file(test_makefile, "LIBCRYPTO= -L.. -lcrypto","LIBCRYPTO=../libcrypto.a")
+                    tools.replace_in_file(test_makefile, "LIBSSL= -L.. -lssl","LIBSSL=../libssl.a")
             else:
                 self.output.info("CROSS_COMPILE: enabled")
                 if self.settings.os == "iOS":
@@ -332,8 +332,8 @@ class OpenSSLConan(ConanFile):
                     tools.replace_in_file(makefile_org, "-L$${libdir} -lssl", "$${libdir}/libssl.a")
                     tools.replace_in_file(apps_makefile, "LIBCRYPTO=-L.. -lcrypto","LIBCRYPTO=../libcrypto.a")
                     tools.replace_in_file(apps_makefile, "LIBSSL=-L.. -lssl","LIBSSL=../libssl.a")
-                    tools.replace_in_file(test_makefile, "LIBCRYPTO=-L.. -lcrypto","LIBCRYPTO=../libcrypto.a")
-                    tools.replace_in_file(test_makefile, "LIBSSL=-L.. -lssl","LIBSSL=../libssl.a")
+                    tools.replace_in_file(test_makefile, "LIBCRYPTO= -L.. -lcrypto","LIBCRYPTO=../libcrypto.a")
+                    tools.replace_in_file(test_makefile, "LIBSSL= -L.. -lssl","LIBSSL=../libssl.a")
 
     def _get_env_build(self):
         if not self._env_build:
