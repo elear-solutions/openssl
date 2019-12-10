@@ -745,11 +745,6 @@ int OPENSSL_NONPIC_relocated = 0;
 void OPENSSL_cpuid_setup(void)
 {
 }
-
-unsigned long OPENSSL_rdtsc(void)
-{
-    return 0;
-}
 #endif
 
 #if (defined(_WIN32) || defined(__CYGWIN__)) && defined(_WINDLL)
