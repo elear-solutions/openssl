@@ -95,6 +95,7 @@ class OpenSSLConan(ConanFile):
     default_options["fPIC"] = True
     default_options["openssldir"] = None
     _env_build = None
+    version="1.0.2-u"
 
     def build_requirements(self):
         # useful for example for conditional build_requires
