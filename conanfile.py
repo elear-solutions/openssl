@@ -95,6 +95,7 @@ class OpenSSLConan(ConanFile):
     default_options["fPIC"] = True
     default_options["openssldir"] = None
     _env_build = None
+    _source_subfolder = ".."
 
     def build_requirements(self):
         # useful for example for conditional build_requires
@@ -122,7 +123,8 @@ class OpenSSLConan(ConanFile):
 
     @property
     def _full_version(self):
-        return "openssl-1.0.2t"
+        # return OpenSSLVersion(self.version)
+        return "1.0.2-t"
 
     def configure(self):
         del self.settings.compiler.libcxx
@@ -291,10 +293,11 @@ class OpenSSLConan(ConanFile):
         def adjust_path(path):
             return path.replace("\\", "/") if tools.os_info.is_windows else path
 
-        makefile_org = "../Makefile.org"
+        makefile_org = os.path.join(self._source_subfolder, "Makefile.org")
         env_build = self._get_env_build()
         with tools.environment_append(env_build.vars):
             if not "CROSS_COMPILE" in os.environ:
+                self.output.info("CROSS_COMPILE: disabled")
                 cc = os.environ.get("CC", "cc")
                 tools.replace_in_file(makefile_org, "CC= cc", "CC= %s %s" % (cc, os.environ["CFLAGS"]))
                 if "AR" in os.environ:
@@ -308,6 +311,11 @@ class OpenSSLConan(ConanFile):
                     tools.replace_in_file(makefile_org, "NM= nm", "NM= %s" % os.environ["NM"])
                 if "AS" in os.environ:
                     tools.replace_in_file(makefile_org, "AS=$(CC) -c", "AS=%s" % os.environ["AS"])
+            else:
+                self.output.info("CROSS_COMPILE: enabled")
+                if self.settings.os == "iOS":
+                    self.output.info("CROSS_COMPILE: iOS")
+                    tools.replace_in_file(makefile_org, "AR=ar $(ARFLAGS) r", "AR=%s" % "libtool -o")
 
     def _get_env_build(self):
         if not self._env_build:
@@ -424,7 +432,7 @@ class OpenSSLConan(ConanFile):
         self.output.info("using target: %s -> %s" % (self._target, self._ancestor_target))
         self.output.info(config)
 
-        tools.save(os.path.join("../Configurations", "20-conan.conf"), config)
+        tools.save(os.path.join(self._source_subfolder, "Configurations", "20-conan.conf"), config)
 
     def _run_make(self, targets=None, makefile=None, parallel=True):
         command = [self._make_program]
@@ -448,37 +456,38 @@ class OpenSSLConan(ConanFile):
         return "perl"
 
     def _make(self):
-        # workaround for MinGW (https://github.com/openssl/openssl/issues/7653)
-        if not os.path.isdir(os.path.join(self.package_folder, "bin")):
-            os.makedirs(os.path.join(self.package_folder, "bin"))
-        # workaround for clang-cl not producing .pdb files
-        if self._is_clangcl:
-            tools.save("ossl_static.pdb", "")
-        args = " ".join(self._configure_args)
-        self.output.info(self._configure_args)
+        with tools.chdir(self._source_subfolder):
+            # workaround for MinGW (https://github.com/openssl/openssl/issues/7653)
+            if not os.path.isdir(os.path.join(self.package_folder, "bin")):
+                os.makedirs(os.path.join(self.package_folder, "bin"))
+            # workaround for clang-cl not producing .pdb files
+            if self._is_clangcl:
+                tools.save("ossl_static.pdb", "")
+            args = " ".join(self._configure_args)
+            self.output.info(self._configure_args)
 
-        self.run('{perl} ./Configure {args}'.format(perl=self._perl, args=args), win_bash=self._win_bash)
+            self.run('{perl} ./Configure {args}'.format(perl=self._perl, args=args), win_bash=self._win_bash)
 
-        self._patch_install_name()
+            self._patch_install_name()
 
-        if self._use_nmake and self._full_version < "1.1.0":
-            if not self.options.no_asm and self.settings.arch == "x86":
-                self.run(r"ms\do_nasm")
+            if self._use_nmake and self._full_version < "1.1.0":
+                if not self.options.no_asm and self.settings.arch == "x86":
+                    self.run(r"ms\do_nasm")
+                else:
+                    self.run(r"ms\do_ms" if self.settings.arch == "x86" else r"ms\do_win64a")
+                makefile = r"ms\ntdll.mak" if self.options.shared else r"ms\nt.mak"
+
+                self._replace_runtime_in_file(os.path.join("ms", "nt.mak"))
+                self._replace_runtime_in_file(os.path.join("ms", "ntdll.mak"))
+                if self.settings.arch == "x86":
+                    tools.replace_in_file(os.path.join("ms", "nt.mak"), "-WX", "")
+                    tools.replace_in_file(os.path.join("ms", "ntdll.mak"), "-WX", "")
+
+                self._run_make(makefile=makefile)
+                self._run_make(makefile=makefile, targets=["install"], parallel=False)
             else:
-                self.run(r"ms\do_ms" if self.settings.arch == "x86" else r"ms\do_win64a")
-            makefile = r"ms\ntdll.mak" if self.options.shared else r"ms\nt.mak"
-
-            self._replace_runtime_in_file(os.path.join("ms", "nt.mak"))
-            self._replace_runtime_in_file(os.path.join("ms", "ntdll.mak"))
-            if self.settings.arch == "x86":
-                tools.replace_in_file(os.path.join("ms", "nt.mak"), "-WX", "")
-                tools.replace_in_file(os.path.join("ms", "ntdll.mak"), "-WX", "")
-
-            self._run_make(makefile=makefile)
-            self._run_make(makefile=makefile, targets=["install"], parallel=False)
-        else:
-            self._run_make()
-            self._run_make(targets=["install_sw"], parallel=False)
+                self._run_make()
+                self._run_make(targets=["install_sw"], parallel=False)
 
     @property
     def _cc(self):
@@ -557,7 +566,7 @@ class OpenSSLConan(ConanFile):
             tools.replace_in_file(filename, "/%s " % e, "/%s " % self.settings.compiler.runtime, strict=False)
 
     def package(self):
-        self.copy(src=".", pattern="*LICENSE", dst="licenses")
+        self.copy(src=self._source_subfolder, pattern="*LICENSE", dst="licenses")
         for root, _, files in os.walk(self.package_folder):
             for filename in files:
                 if fnmatch.fnmatch(filename, "*.pdb"):
