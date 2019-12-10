@@ -497,9 +497,8 @@ class OpenSSLConan(ConanFile):
     def build(self):
         with tools.vcvars(self.settings) if self._use_nmake else tools.no_op():
             env_vars = {"PERL": self._perl}
-            if self._full_version < "1.1.0":
-                cflags = " ".join(self._get_env_build().flags)
-                env_vars["CC"] = "%s %s" % (self._cc, cflags)
+            cflags = " ".join(self._get_env_build().flags)
+            env_vars["CC"] = "%s %s" % (self._cc, cflags)
             if self.settings.compiler == "apple-clang":
                 xcrun = tools.XCRun(self.settings)
                 env_vars["CROSS_SDK"] = os.path.basename(xcrun.sdk_path)
@@ -569,7 +568,7 @@ class OpenSSLConan(ConanFile):
                     os.rename('libcrypto.lib', 'libcryptod.lib')
         # Old OpenSSL version family has issues with permissions.
         # See https://github.com/conan-io/conan/issues/5831
-        if self._full_version < "1.1.0" and self.options.shared and self.settings.os in ("Android", "FreeBSD", "Linux"):
+        if self.options.shared and self.settings.os in ("Android", "FreeBSD", "Linux"):
             with tools.chdir(os.path.join(self.package_folder, "lib")):
                 os.chmod("libssl.so.1.0.0", 0o755)
                 os.chmod("libcrypto.so.1.0.0", 0o755)
