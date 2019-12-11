@@ -511,23 +511,20 @@ class OpenSSLConan(ConanFile):
             tools.replace_in_file(filename, "/%s " % e, "/%s " % self.settings.compiler.runtime, strict=False)
 
     def package(self):
-        #self.copy(src=self._source_subfolder, pattern="*LICENSE", dst="licenses")
-        os.chdir(os.path.dirname(__file__))
-        print(os.getcwd())
-        self.copy(src=os.path.join("Users","shrinivas","Desktop","WS","openssl_offical", "build", "package","lib"), pattern="*", dst=os.getcwd(), keep_path=False)
-        print("package lib done",os.path.join("Users","shrinivas","Desktop","WS","openssl_offical", "build", "package","lib"))
-        self.copy(src=os.path.join("Users","shrinivas","Desktop","WS","openssl_offical", "build", "package","include"), pattern="*", dst=os.getcwd(), keep_path=False)
-        print("package include done",  os.path.join("Users","shrinivas","Desktop","WS","openssl_offical", "build", "package","include"))
-        #for root, _, files in os.walk(self.package_folder):
+        # self.copy(src=self._source_subfolder, pattern="*LICENSE", dst="licenses")
+        # os.chdir(os.path.dirname(__file__))
+        self.copy(src="package/lib", pattern="*", dst="lib", keep_path=False)
+        self.copy(src="package/include", pattern="*.h", dst="include", keep_path=False)
+        # for root, _, files in os.walk(self.package_folder):
         #    for filename in files:
         #        if fnmatch.fnmatch(filename, "*.pdb"):
         #            os.unlink(os.path.join(self.package_folder, root, filename))
-        #if self.settings.os == "Windows" and self.settings.compiler == "Visual Studio":
+        # if self.settings.os == "Windows" and self.settings.compiler == "Visual Studio":
         #    if self.settings.build_type == 'Debug' and self._full_version >= "1.1.0":
         #        with tools.chdir(os.path.join(self.package_folder, 'lib')):
         #            os.rename('libssl.lib', 'libssld.lib')
         #            os.rename('libcrypto.lib', 'libcryptod.lib')
-        #tools.rmdir(os.path.join(self.package_folder, "lib", "pkgconfig"))
+        # tools.rmdir(os.path.join(self.package_folder, "lib", "pkgconfig"))
 
     def package_info(self):
         if self.settings.compiler == "Visual Studio":
