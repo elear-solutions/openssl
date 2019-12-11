@@ -114,7 +114,7 @@ class OpenSSLConan(ConanFile):
 
     @property
     def _full_version(self):
-        return OpenSSLVersion(self.version)
+        return "1.0.2t"
 
     def configure(self):
         del self.settings.compiler.libcxx
