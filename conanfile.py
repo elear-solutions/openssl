@@ -62,7 +62,7 @@ class OpenSSLVersion(object):
 
 
 class OpenSSLConan(ConanFile):
-    name = "OpenSSL"
+    name = "openssl"
     settings = "os", "compiler", "arch", "build_type"
     url = "http://github.com/conan-community/conan-openssl"
     homepage = "https://github.com/openssl/openssl"
@@ -115,55 +115,6 @@ class OpenSSLConan(ConanFile):
     @property
     def _full_version(self):
         return OpenSSLVersion(self.version)
-
-    def source(self):
-        sha256 = {
-            "1.0.2": "8c48baf3babe0d505d16cfc0cf272589c66d3624264098213db0fb00034728e9",
-            "1.0.2a": "15b6393c20030aab02c8e2fe0243cb1d1d18062f6c095d67bca91871dc7f324a",
-            "1.0.2b": "d5d488cc9f0a07974195a7427094ea3cab9800a4e90178b989aa621fbc238e3f",
-            "1.0.2c": "0038ba37f35a6367c58f17a7a7f687953ef8ce4f9684bbdec63e62515ed36a83",
-            "1.0.2d": "671c36487785628a703374c652ad2cebea45fa920ae5681515df25d9f2c9a8c8",
-            "1.0.2e": "e23ccafdb75cfcde782da0151731aa2185195ac745eea3846133f2e05c0e0bff",
-            "1.0.2f": "932b4ee4def2b434f85435d9e3e19ca8ba99ce9a065a61524b429a9d5e9b2e9c",
-            "1.0.2g": "b784b1b3907ce39abf4098702dade6365522a253ad1552e267a9a0e89594aa33",
-            "1.0.2h": "1d4007e53aad94a5b2002fe045ee7bb0b3d98f1a47f8b2bc851dcd1c74332919",
-            "1.0.2i": "9287487d11c9545b6efb287cdb70535d4e9b284dd10d51441d9b9963d000de6f",
-            "1.0.2j": "e7aff292be21c259c6af26469c7a9b3ba26e9abaaffd325e3dccc9785256c431",
-            "1.0.2k": "6b3977c61f2aedf0f96367dcfb5c6e578cf37e7b8d913b4ecb6643c3cb88d8c0",
-            "1.0.2l": "ce07195b659e75f4e1db43552860070061f156a98bb37b672b101ba6e3ddf30c",
-            "1.0.2m": "8c6ff15ec6b319b50788f42c7abc2890c08ba5a1cdcd3810eb9092deada37b0f",
-            "1.0.2n": "370babb75f278c39e0c50e8c4e7493bc0f18db6867478341a832a982fd15a8fe",
-            "1.0.2o": "ec3f5c9714ba0fd45cb4e087301eb1336c317e0d20b575a125050470e8089e4d",
-            "1.0.2p": "50a98e07b1a89eb8f6a99477f262df71c6fa7bef77df4dc83025a2845c827d00",
-            "1.0.2q": "5744cfcbcec2b1b48629f7354203bc1e5e9b5466998bbccc5b5fcde3b18eb684",
-            "1.0.2r": "ae51d08bba8a83958e894946f15303ff894d75c2b8bbd44a852b64e3fe11d0d6",
-            "1.0.2s": "cabd5c9492825ce5bd23f3c3aeed6a97f8142f606d893df216411f07d1abab96",
-            "1.1.0": "f5c69ff9ac1472c80b868efc1c1c0d8dcfc746d29ebe563de2365dd56dbd8c82",
-            "1.1.0a": "c2e696e34296cde2c9ec5dcdad9e4f042cd703932591d395c389de488302442b",
-            "1.1.0b": "a45de072bf9be4dea437230aaf036000f0e68c6a665931c57e76b5b036cef6f7",
-            "1.1.0c": "fc436441a2e05752d31b4e46115eb89709a28aef96d4fe786abe92409b2fd6f5",
-            "1.1.0d": "7d5ebb9e89756545c156ff9c13cf2aa6214193b010a468a3bc789c3c28fe60df",
-            "1.1.0e": "57be8618979d80c910728cfc99369bf97b2a1abd8f366ab6ebdee8975ad3874c",
-            "1.1.0f": "12f746f3f2493b2f39da7ecf63d7ee19c6ac9ec6a4fcd8c229da8a522cb12765",
-            "1.1.0g": "de4d501267da39310905cb6dc8c6121f7a2cad45a7707f76df828fe1b85073af",
-            "1.1.0h": "5835626cde9e99656585fc7aaa2302a73a7e1340bf8c14fd635a62c66802a517",
-            "1.1.0i": "ebbfc844a8c8cc0ea5dc10b86c9ce97f401837f3fa08c17b2cdadc118253cf99",
-            "1.1.0j": "31bec6c203ce1a8e93d5994f4ed304c63ccf07676118b6634edded12ad1b3246",
-            "1.1.0k": "efa4965f4f773574d6cbda1cf874dbbe455ab1c0d4f906115f867d30444470b1",
-            "1.1.1": "2836875a0f89c03d0fdf483941512613a50cfb421d6fd94b9f41d7279d586a3d",
-            "1.1.1a": "fc20130f8b7cbd2fb918b2f14e2f429e109c31ddd0fb38fc5d71d9ffed3f9f41",
-            "1.1.1b": "5c557b023230413dfb0756f3137a13e6d726838ccd1430888ad15bfb2b43ea4b",
-            "1.1.1c": "f6fb3079ad15076154eda9413fed42877d668e7069d9b87396d0804fdb3f4c90",
-        }
-        try:
-            url = "https://www.openssl.org/source/openssl-%s.tar.gz" % self.version
-            tools.get(url, sha256=sha256[self.version])
-        except ConanException:
-            url = url.replace("https://www.openssl.org/source/",
-                              "https://www.openssl.org/source/old/%s" % self._full_version.base)
-            tools.get(url, sha256=sha256[self.version])
-        extracted_folder = "openssl-" + self.version
-        os.rename(extracted_folder, self._source_subfolder)
 
     def configure(self):
         del self.settings.compiler.libcxx
@@ -336,7 +287,7 @@ class OpenSSLConan(ConanFile):
             cc = os.environ.get("CC", "cc")
             try:
               tools.replace_in_file(makefile_org, "CC= cc", "CC= %s %s" % (cc, os.environ["CFLAGS"]))
-            
+
               if "AR" in os.environ:
                   tools.replace_in_file(makefile_org, "AR=ar", "AR=%s" % os.environ["AR"])
               if "RANLIB" in os.environ:
@@ -348,7 +299,7 @@ class OpenSSLConan(ConanFile):
                   tools.replace_in_file(makefile_org, "NM= nm", "NM= %s" % os.environ["NM"])
               if "AS" in os.environ:
                   tools.replace_in_file(makefile_org, "AS=$(CC) -c", "AS=%s" % os.environ["AS"])
-            
+
             except ConanException:
               print("alredy present")
     def _get_env_build(self):
