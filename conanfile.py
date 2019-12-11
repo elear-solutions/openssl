@@ -108,9 +108,9 @@ class OpenSSLConan(ConanFile):
         # useful for example for conditional build_requires
         if tools.os_info.is_windows:
             if not self._win_bash:
-                self.build_requires("strawberryperl/5.30.0.1@conan/stable")
+                self.build_requires("strawberryperl/5.30.0.1@jenkins/master")
             if not self.options.no_asm and not tools.which("nasm"):
-                self.build_requires("nasm/2.13.01@conan/stable")
+                self.build_requires("nasm/2.13.01@jenkins/master")
 
     @property
     def _full_version(self):
@@ -127,7 +127,7 @@ class OpenSSLConan(ConanFile):
 
     def requirements(self):
         if not self.options.no_zlib:
-            self.requires("zlib/1.2.11@conan/stable")
+            self.requires("zlib/1.2.11@jenkins/master")
 
     @property
     def _target_prefix(self):
