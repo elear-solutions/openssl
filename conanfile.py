@@ -97,6 +97,7 @@ class OpenSSLConan(ConanFile):
                "openssldir": "ANY"}
     default_options = {key: False for key in options.keys()}
     default_options["fPIC"] = True
+    default_options["no_asm"] = True
     default_options["openssldir"] = None
     #default_options["no_md2"] = False
     _env_build = None
