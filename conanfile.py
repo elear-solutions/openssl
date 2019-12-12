@@ -473,7 +473,7 @@ class OpenSSLConan(ConanFile):
     def build(self):
         if os.path.isfile(os.path.join(self._source_subfolder, "libcrypto.a")):
             try:
-                self.run("cd .. && make distclean")
+                self.run("cd .. && make clean && make distclean")
             except:
                 pass
         with tools.vcvars(self.settings) if self.settings.compiler == "Visual Studio" else tools.no_op():
