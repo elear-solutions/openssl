@@ -472,7 +472,7 @@ class OpenSSLConan(ConanFile):
 
     def build(self):
         if os.path.isfile(os.path.join(self._source_subfolder, "libcrypto.a")):
-            self.run("make distclean")
+            self.run("cd .. && make distclean")
         with tools.vcvars(self.settings) if self.settings.compiler == "Visual Studio" else tools.no_op():
             env_vars = {"PERL": self._perl}
             if self.settings.compiler == "apple-clang":
