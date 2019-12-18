@@ -520,7 +520,7 @@ class OpenSSLConan(ConanFile):
         # self.copy(src=self._source_subfolder, pattern="*LICENSE", dst="licenses")
         # os.chdir(os.path.dirname(__file__))
         self.copy(src="package/lib", pattern="*", dst="lib", keep_path=False)
-        self.copy(src="package/include", pattern="*.h", dst="include", keep_path=False)
+        self.copy(src="package/include", pattern="*.h", dst="include/openssl", keep_path=False)
         # for root, _, files in os.walk(self.package_folder):
         #    for filename in files:
         #        if fnmatch.fnmatch(filename, "*.pdb"):
