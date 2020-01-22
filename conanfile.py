@@ -63,7 +63,7 @@ class OpenSSLVersion(object):
 
 class OpenSSLConan(ConanFile):
     name = "OpenSSL"
-    version = "1.0.2t"
+    version = "1.0.2r"
     settings = "os", "compiler", "arch", "build_type"
     url = "https://github.com/elear-solutions/openssl"
     homepage = "https://github.com/openssl/openssl"
@@ -118,7 +118,7 @@ class OpenSSLConan(ConanFile):
 
     @property
     def _full_version(self):
-        return "1.0.2t"
+        return "1.0.2r"
 
     def configure(self):
         del self.settings.compiler.libcxx
