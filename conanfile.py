@@ -62,39 +62,42 @@ class OpenSSLVersion(object):
 
 
 class OpenSSLConan(ConanFile):
-    name = "openssl"
+    name = "OpenSSL"
+    version = "1.0.2t"
     settings = "os", "compiler", "arch", "build_type"
-    url = "http://github.com/conan-community/conan-openssl"
+    url = "https://github.com/elear-solutions/openssl"
     homepage = "https://github.com/openssl/openssl"
-    author = "Conan Community"
-    license = "OpenSSL"
-    topics = ("conan", "openssl", "ssl", "tls", "encryption", "security")
+    author = "<Put your name here> <And your email here>"
+    license = "<Put the package license here>"
+    topics = ("openssl", "ssl", "tls", "encryption", "security")
     description = "A toolkit for the Transport Layer Security (TLS) and Secure Sockets Layer (SSL) protocols"
-    options = {"no_threads": [True, False],
-               "no_zlib": [True, False],
-               "shared": [True, False],
-               "fPIC": [True, False],
-               "no_asm": [True, False],
-               "386": [True, False],
-               "no_sse2": [True, False],
-               "no_bf": [True, False],
-               "no_cast": [True, False],
-               "no_des": [True, False],
-               "no_dh": [True, False],
-               "no_dsa": [True, False],
-               "no_hmac": [True, False],
-               "no_md2": [True, False],
-               "no_md5": [True, False],
-               "no_mdc2": [True, False],
-               "no_rc2": [True, False],
-               "no_rc4": [True, False],
-               "no_rc5": [True, False],
-               "no_rsa": [True, False],
-               "no_sha": [True, False],
-               "no_async": [True, False],
-               "no_dso": [True, False],
-               "capieng_dialog": [True, False],
-               "openssldir": "ANY"}
+    options = {
+        "no_threads": [True, False],
+        "no_zlib": [True, False],
+        "shared": [True, False],
+        "fPIC": [True, False],
+        "no_asm": [True, False],
+        "386": [True, False],
+        "no_sse2": [True, False],
+        "no_bf": [True, False],
+        "no_cast": [True, False],
+        "no_des": [True, False],
+        "no_dh": [True, False],
+        "no_dsa": [True, False],
+        "no_hmac": [True, False],
+        "no_md2": [True, False],
+        "no_md5": [True, False],
+        "no_mdc2": [True, False],
+        "no_rc2": [True, False],
+        "no_rc4": [True, False],
+        "no_rc5": [True, False],
+        "no_rsa": [True, False],
+        "no_sha": [True, False],
+        "no_async": [True, False],
+        "no_dso": [True, False],
+        "capieng_dialog": [True, False],
+        "openssldir": "ANY"
+        }
     default_options = {key: False for key in options.keys()}
     default_options["fPIC"] = True
     default_options["no_asm"] = True
