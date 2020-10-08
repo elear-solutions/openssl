@@ -130,7 +130,7 @@ class OpenSSLConan(ConanFile):
         else:
             del self.options.fPIC
         if tools.is_apple_os(self.settings.os):
-            default_options["shared"] = False
+            self.options.shared = False
 
     def requirements(self):
         if not self.options.no_zlib:
