@@ -102,6 +102,7 @@ class OpenSSLConan(ConanFile):
     default_options["fPIC"] = True
     default_options["no_asm"] = True
     default_options["openssldir"] = None
+    default_options["shared"] = True
     #default_options["no_md2"] = False
     _env_build = None
     os.chdir(os.path.dirname(__file__))
@@ -128,6 +129,8 @@ class OpenSSLConan(ConanFile):
             del self.options.capieng_dialog
         else:
             del self.options.fPIC
+        if tools.is_apple_os(self.settings.os):
+            self.options.shared = False
 
     def requirements(self):
         if not self.options.no_zlib:
