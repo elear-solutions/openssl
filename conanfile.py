@@ -129,6 +129,8 @@ class OpenSSLConan(ConanFile):
             del self.options.capieng_dialog
         else:
             del self.options.fPIC
+        if tools.is_apple_os(self.settings.os):
+            default_options["shared"] = False
 
     def requirements(self):
         if not self.options.no_zlib:
