@@ -310,10 +310,17 @@ class OpenSSLConan(ConanFile):
         os.chdir(os.path.dirname(__file__))
         print(os.getcwd())
         makefile_org = os.path.join(os.getcwd(), "Makefile.org")
+        backup_path = makefile_org + ".conan_backup"
         
-        # Backup the original Makefile.org
+        # If a backup exists from a previous crashed build, restore Makefile.org first
+        if os.path.isfile(backup_path) and self._makefile_org_backup is None:
+            self.output.info("Found existing backup from previous build, restoring Makefile.org")
+            shutil.copy2(backup_path, makefile_org)
+            self._makefile_org_backup = backup_path
+        
+        # Backup the original Makefile.org (only if we don't already have a backup)
         if os.path.isfile(makefile_org) and self._makefile_org_backup is None:
-            self._makefile_org_backup = makefile_org + ".conan_backup"
+            self._makefile_org_backup = backup_path
             shutil.copy2(makefile_org, self._makefile_org_backup)
             self.output.info("Backed up Makefile.org to %s" % self._makefile_org_backup)
         
