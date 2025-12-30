@@ -1,4 +1,5 @@
 import os
+import shutil
 import fnmatch
 from functools import total_ordering
 from conans.errors import ConanInvalidConfiguration, ConanException
@@ -105,17 +106,34 @@ class OpenSSLConan(ConanFile):
     default_options["shared"] = True
     #default_options["no_md2"] = False
     _env_build = None
+    _makefile_org_backup = None
     os.chdir(os.path.dirname(__file__))
     print(os.getcwd())
     _source_subfolder = os.getcwd()
 
+    def _get_install_channel(self):
+        """
+        Get dependency channel with fallback logic.
+        
+        Priority:
+        1. INSTALL_CHANNEL environment variable (explicit override - any channel)
+        2. 'master' (production default)
+        """
+        install_channel = os.getenv('INSTALL_CHANNEL')
+        if install_channel:
+            return install_channel
+        
+        return 'master'
+
     def build_requirements(self):
         # useful for example for conditional build_requires
+        default_user = getattr(self, 'user', 'jenkins')
+        install_channel = self._get_install_channel()
         if tools.os_info.is_windows:
             if not self._win_bash:
-                self.build_requires("strawberryperl/5.30.0.1@jenkins/master")
+                self.build_requires("strawberryperl/5.30.0.1@%s/%s" % (default_user, install_channel))
             if not self.options.no_asm and not tools.which("nasm"):
-                self.build_requires("nasm/2.13.01@jenkins/master")
+                self.build_requires("nasm/2.13.01@%s/%s" % (default_user, install_channel))
 
     @property
     def _full_version(self):
@@ -134,7 +152,9 @@ class OpenSSLConan(ConanFile):
 
     def requirements(self):
         if not self.options.no_zlib:
-            self.requires("zlib/1.2.11@jenkins/master")
+            default_user = getattr(self, 'user', 'jenkins')
+            install_channel = self._get_install_channel()
+            self.requires("zlib/1.2.11@%s/%s" % (default_user, install_channel))
 
     @property
     def _target_prefix(self):
@@ -286,9 +306,24 @@ class OpenSSLConan(ConanFile):
     def _patch_makefile_org(self):
         # https://wiki.openssl.org/index.php/Compilation_and_Installation#Modifying_Build_Settings
         # its often easier to modify Configure and Makefile.org rather than trying to add targets to the configure scripts
+        # We backup Makefile.org before modifying it, then restore it after build
         os.chdir(os.path.dirname(__file__))
         print(os.getcwd())
         makefile_org = os.path.join(os.getcwd(), "Makefile.org")
+        backup_path = makefile_org + ".conan_backup"
+        
+        # If a backup exists from a previous crashed build, restore Makefile.org first
+        if os.path.isfile(backup_path) and self._makefile_org_backup is None:
+            self.output.info("Found existing backup from previous build, restoring Makefile.org")
+            shutil.copy2(backup_path, makefile_org)
+            self._makefile_org_backup = backup_path
+        
+        # Backup the original Makefile.org (only if we don't already have a backup)
+        if os.path.isfile(makefile_org) and self._makefile_org_backup is None:
+            self._makefile_org_backup = backup_path
+            shutil.copy2(makefile_org, self._makefile_org_backup)
+            self.output.info("Backed up Makefile.org to %s" % self._makefile_org_backup)
+        
         env_build = self._get_env_build()
         with tools.environment_append(env_build.vars):
             cc = os.environ.get("CC", "cc")
@@ -309,6 +344,15 @@ class OpenSSLConan(ConanFile):
 
             except ConanException:
               print("alredy present")
+
+    def _restore_makefile_org(self):
+        """Restore Makefile.org from backup after build completes"""
+        if self._makefile_org_backup and os.path.isfile(self._makefile_org_backup):
+            makefile_org = os.path.join(os.path.dirname(__file__), "Makefile.org")
+            shutil.copy2(self._makefile_org_backup, makefile_org)
+            os.remove(self._makefile_org_backup)
+            self.output.info("Restored Makefile.org from backup")
+            self._makefile_org_backup = None
     def _get_env_build(self):
         if not self._env_build:
             self._env_build = AutoToolsBuildEnvironment(self)
@@ -492,11 +536,16 @@ class OpenSSLConan(ConanFile):
                 cflags = " ".join(self._get_env_build().flags)
                 env_vars["CC"] = "%s %s" % (cc, cflags)
             with tools.environment_append(env_vars):
-                if self._full_version >= "1.1.0":
-                    self._create_targets()
-                else:
-                    self._patch_makefile_org()
-                self._make()
+                try:
+                    if self._full_version >= "1.1.0":
+                        self._create_targets()
+                    else:
+                        self._patch_makefile_org()
+                    self._make()
+                finally:
+                    # Always restore Makefile.org after build, even if it fails
+                    if self._full_version < "1.1.0":
+                        self._restore_makefile_org()
 
     @property
     def _win_bash(self):
