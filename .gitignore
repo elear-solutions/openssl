@@ -2,6 +2,15 @@
 *.o
 *.obj
 
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+
+# Conan build backups
+Makefile.org.conan_backup
+
 # editor artefacts
 *.swp
 .#*
