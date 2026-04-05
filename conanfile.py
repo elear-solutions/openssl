@@ -381,8 +381,10 @@ class OpenSSLConan(ConanFile):
         if self._full_version >= "1.1.0":
             args.append("--debug" if self.settings.build_type == "Debug" else "--release")
 
-        if self.settings.os == "Android":
-            args.append(" -D__ANDROID_API__=%s" % str(self.settings.os.api_level))  # see NOTES.ANDROID
+        # Note: __ANDROID_API__ is automatically defined by modern NDK toolchains
+        # (e.g., x86_64-linux-android21-clang defines it as 21), so we don't need to define it explicitly
+        # if self.settings.os == "Android":
+        #     args.append(" -D__ANDROID_API__=%s" % str(self.settings.os.api_level))  # see NOTES.ANDROID
         if self.settings.os == "Emscripten":
             args.append("-D__STDC_NO_ATOMICS__=1")
         if self.settings.os == "Windows":
